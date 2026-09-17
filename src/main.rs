@@ -1,4 +1,8 @@
 mod email;
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+mod errors;
+mod upload;
+
+#[tokio::main]
+async fn main() {
     todo!()
 }
