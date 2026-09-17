@@ -2,11 +2,15 @@ use base64::{Engine as _, engine::general_purpose::STANDARD};
 use mail_parser::{MessageParser, MimeHeaders};
 
 #[derive(Debug)]
+pub struct Attachement {
+    pub filename: String,
+    pub contents: String,
+}
+#[derive(Debug)]
 pub struct Email {
     pub email: String,
     pub title: String,
-    pub filename: String,
-    pub contents: String,
+    pub attachments: Vec<Attachement>,
 }
 
 pub fn parse_email(data: &[u8]) -> Result<Email, String> {
@@ -25,24 +29,23 @@ pub fn parse_email(data: &[u8]) -> Result<Email, String> {
         .subject()
         .map(|subject| subject.to_string())
         .ok_or_else(|| "email subject not found".to_string())?;
-
-    let attachment = message
-        .attachments()
-        .next()
-        .ok_or_else(|| "attachment not found".to_string())?;
-
-    let filename = attachment
-        .attachment_name()
-        .ok_or_else(|| "attachment filename not found".to_string())?
-        .to_string();
-
-    let contents = STANDARD.encode(attachment.contents());
+    let mut attachments = vec![];
+    for a in message.attachments() {
+        if let Some(file_name) = a.attachment_name() {
+            let contents = STANDARD.encode(a.contents());
+            if contents.len() > 1024 {
+                attachments.push(Attachement {
+                    filename: file_name.to_owned(),
+                    contents,
+                });
+            }
+        }
+    }
 
     Ok(Email {
         email,
         title,
-        filename,
-        contents,
+        attachments,
     })
 }
 
@@ -75,9 +78,9 @@ CkxpbmUgdHdvLgo=
         Ok(e) => {
             assert_eq!(e.email, "finance@example.com".to_owned());
             assert_eq!(e.title, "Q3 invoice".to_owned());
-            assert_eq!(e.filename, "invoice.txt".to_owned());
+            assert_eq!(e.attachments[0].filename, "invoice.txt".to_owned());
             assert_eq!(
-                e.contents,
+                e.attachments[0].contents,
                 "VGhpcyBpcyBhIHRlc3QgYXR0YWNobWVudCBmaWxlIGZvciB0aGUgQ0RBIG1vY2sgcGlwZWxpbmUuCkxpbmUgdHdvLgo="
                     .to_owned()
             );
