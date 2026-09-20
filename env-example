@@ -1,3 +1,9 @@
 POP_DOMAIN=mail.com
 POP_USER=user@main
 POP_PASS=passwordexample
+CDA_USER=usernameforuploading
+CDA_PASS=userpasswordforuploading
+CDA_DOMAIN=domainusedforuploading
+CDA_ENDPOINT=endpointCalledForUploading
+# max attempts per attachmenet before it considered terminal
+MAX_ATTEMPTS=10 #default value

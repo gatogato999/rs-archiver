@@ -33,12 +33,10 @@ pub fn parse_email(data: &[u8]) -> Result<Email, String> {
     for a in message.attachments() {
         if let Some(file_name) = a.attachment_name() {
             let contents = STANDARD.encode(a.contents());
-            if contents.len() >= 1024 {
-                attachments.push(Attachement {
-                    filename: file_name.to_owned(),
-                    contents,
-                });
-            }
+            attachments.push(Attachement {
+                filename: file_name.to_owned(),
+                contents,
+            });
         }
     }
 

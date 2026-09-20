@@ -3,6 +3,6 @@
 *.sh
 **/mock-eml/   
 *.eml
-
+*.json
 .env
 *.eml
