@@ -2,14 +2,11 @@ use std::env;
 
 use async_pop::response::types::DataType;
 
-use crate::{
+use rs_archiver::{
     email::parse_email,
     storage::{AttachmentKey, AttachmentStatus, Store},
+    upload::{UploadReq, call_upload},
 };
-
-mod email;
-mod storage;
-mod upload;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -93,9 +90,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         continue;
                     }
 
-                    let status: AttachmentStatus = upload::call_upload(
+                    let status: AttachmentStatus = call_upload(
                         &cda_endpoint,
-                        upload::UploadReq {
+                        UploadReq {
                             username: uploader_user_name.clone(),
                             password: uploader_user_pass.clone(),
                             email: email.email.clone(),
@@ -122,7 +119,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if attachment_names.is_empty() {
                     println!("skipp msg with no attch : uidl={}", uidl);
                 } else if store.message_is_fully_resolved(uidl, &attachment_names) {
-                    client.dele(number).await?;
                     if let Err(e) = client.dele(number).await {
                         eprintln!("failed to del message {number} (uidl {uidl}): {e}");
                     } else {
