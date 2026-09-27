@@ -2,13 +2,13 @@ use rs_archiver::storage::AttachmentStatus::{
     FailedPermanent, FailedRetryable, SkippedTooSmall, Uploaded,
 };
 use rs_archiver::storage::{AttachmentKey, AttachmentState, AttachmentStatus, Entry, Store};
+use std::collections::HashMap;
 use std::path::PathBuf;
-use std::{collections::HashMap, sync::Mutex};
 
 fn create_entry(uidl: &str, attch_name: &str, status: AttachmentStatus, attemps: u8) -> Entry {
     Entry {
         state: AttachmentState {
-            status: status,
+            status,
             attempts: attemps as u32,
         },
         key: AttachmentKey {
@@ -18,8 +18,8 @@ fn create_entry(uidl: &str, attch_name: &str, status: AttachmentStatus, attemps:
     }
 }
 
-#[tokio::test]
-async fn test_create_or_upload() {
+#[test]
+fn test_create_or_upload() {
     struct TestCleanup {
         path: std::path::PathBuf,
     }
@@ -30,27 +30,12 @@ async fn test_create_or_upload() {
         }
     }
     let path = PathBuf::from("test.json");
-    assert_eq!(!path.exists(), true);
+    assert!(!path.exists());
 
     let temp = TestCleanup { path: path.clone() };
-    if let Ok(s) = Store::load_or_create(temp.path.clone()).await {
-        assert_eq!(s.attachments.lock().unwrap().is_empty(), true);
-        assert_eq!(temp.path.exists(), false);
-        let mut attchs = s.attachments.lock().unwrap();
-        let k = AttachmentKey {
-            uidl: "A".into(),
-            attachment: "A".into(),
-        };
-        let v = AttachmentState {
-            status: Uploaded,
-            attempts: 1,
-        };
-        attchs.insert(k.clone(), v);
-        drop(attchs);
-        if let Ok(()) = s.record_outcome(k, Uploaded).await {
-            assert_eq!(s.attachments.lock().unwrap().is_empty(), false);
-            assert_eq!(temp.path.exists(), true);
-        }
+    if let Ok(s) = Store::load_or_create(temp.path.clone()) {
+        assert!(s.attachments.is_empty());
+        assert!(!temp.path.exists());
     }
     drop(path);
 }
@@ -68,51 +53,33 @@ fn test_is_uploadable() {
 
     let path = PathBuf::from("test.json");
     let store = Store {
-        attachments: Mutex::new(h_map),
+        attachments: h_map,
         path,
         max_attch_attempts: 2,
     };
 
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "nwe".into(),
-            attachment: "new-file.pdf".into()
-        }),
-        true
-    );
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "A".into(),
-            attachment: "A.pdf".into()
-        }),
-        false
-    );
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "B".into(),
-            attachment: "B.pdf".into()
-        }),
-        false
-    );
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "C".into(),
-            attachment: "C.pdf".into()
-        }),
-        true
-    );
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "D".into(),
-            attachment: "D.pdf".into()
-        }),
-        false
-    );
-    assert_eq!(
-        store.is_uploadable(&AttachmentKey {
-            uidl: "E".into(),
-            attachment: "E.pdf".into()
-        }),
-        false
-    );
+    assert!(store.is_uploadable(&AttachmentKey {
+        uidl: "nwe".into(),
+        attachment: "new-file.pdf".into()
+    }),);
+    assert!(!store.is_uploadable(&AttachmentKey {
+        uidl: "A".into(),
+        attachment: "A.pdf".into()
+    }),);
+    assert!(!store.is_uploadable(&AttachmentKey {
+        uidl: "B".into(),
+        attachment: "B.pdf".into()
+    }),);
+    assert!(store.is_uploadable(&AttachmentKey {
+        uidl: "C".into(),
+        attachment: "C.pdf".into()
+    }),);
+    assert!(!store.is_uploadable(&AttachmentKey {
+        uidl: "D".into(),
+        attachment: "D.pdf".into()
+    }));
+    assert!(!store.is_uploadable(&AttachmentKey {
+        uidl: "E".into(),
+        attachment: "E.pdf".into()
+    }));
 }

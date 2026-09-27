@@ -13,7 +13,7 @@ pub struct Email {
     pub attachments: Vec<Attachement>,
 }
 
-pub fn parse_email(data: &[u8]) -> Result<Email, String> {
+pub fn parse_email(data: &str) -> Result<Email, String> {
     let message = MessageParser::default()
         .parse(data)
         .ok_or_else(|| "failed to parse email".to_string())?;

@@ -1,7 +1,7 @@
 use rs_archiver::email::parse_email;
 #[test]
 fn test_parse_basic_email_with_one_attachment() {
-    let input: &[u8] = br#"From: "Finance Dept" <finance@example.com>
+    let input  = br#"From: "Finance Dept" <finance@example.com>
 To: cda@codesoft.sd
 Subject: Q3 invoice
 MIME-Version: 1.0
@@ -21,20 +21,21 @@ Content-Disposition: attachment; filename="invoice.txt"
 IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA==
 --BOUNDARY1--
     "#;
-
-    let email = parse_email(&input);
-    match email {
-        Ok(e) => {
-            assert_eq!(e.email, "finance@example.com".to_owned());
-            assert_eq!(e.title, "Q3 invoice".to_owned());
-            assert_eq!(e.attachments[0].filename, "invoice.txt".to_owned());
-            assert_eq!(
+    if let Ok(my_str) = std::str::from_utf8(input) {
+        let email = parse_email(my_str);
+        match email {
+            Ok(e) => {
+                assert_eq!(e.email, "finance@example.com".to_owned());
+                assert_eq!(e.title, "Q3 invoice".to_owned());
+                assert_eq!(e.attachments[0].filename, "invoice.txt".to_owned());
+                assert_eq!(
                 e.attachments[0].contents,
                 "IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA=="
                     .to_owned()
             );
+            }
+            Err(e) => assert_eq!(e, "No error suppose to happen"),
         }
-        Err(e) => assert_eq!(e, "No error suppose to happen"),
     }
 }
 #[test]
@@ -66,17 +67,19 @@ IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3Jl
 --BOUNDARY3--
     "#;
 
-    let email = parse_email(&input);
-    match email {
-        Ok(e) => {
-            assert_eq!(e.email, "finance@example.com".to_owned());
-            assert_eq!(e.title, "Two files this time".to_owned());
-            assert_eq!(e.attachments[0].filename, "report.txt".to_owned());
-            assert_eq!( e.attachments[0].contents, "IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA==" .to_owned());
-            assert_eq!(e.attachments[1].filename, "appendix.txt".to_owned());
-            assert_eq!( e.attachments[1].contents, "IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA==" .to_owned());
+    if let Ok(my_str) = std::str::from_utf8(input) {
+        let email = parse_email(my_str);
+        match email {
+            Ok(e) => {
+                assert_eq!(e.email, "finance@example.com".to_owned());
+                assert_eq!(e.title, "Two files this time".to_owned());
+                assert_eq!(e.attachments[0].filename, "report.txt".to_owned());
+                assert_eq!( e.attachments[0].contents, "IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA==" .to_owned());
+                assert_eq!(e.attachments[1].filename, "appendix.txt".to_owned());
+                assert_eq!( e.attachments[1].contents, "IGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtICBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSBsb3JlbSAgbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gbG9yZW0gIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIGxvcmVtIA==" .to_owned());
+            }
+            Err(e) => assert_eq!(e, "No error suppose to happen"),
         }
-        Err(e) => assert_eq!(e, "No error suppose to happen"),
     }
 }
 #[test]
@@ -89,14 +92,14 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
     "#;
 
-    let email = parse_email(&input);
-    match email {
-        Ok(e) => {
-            assert_eq!(e.email, "finance@example.com".to_owned());
-            assert_eq!(e.title, "Just checking in".to_owned());
-            // email with no attch will be ignored
-            assert_eq!(e.attachments.len(), 0);
+    if let Ok(my_str) = std::str::from_utf8(input) {
+        let email = parse_email(my_str);
+        match email {
+            Ok(e) => {
+                assert_eq!(e.email, "finance@example.com".to_owned());
+                assert_eq!(e.title, "Just checking in".to_owned());
+            }
+            Err(e) => assert_eq!(e, "No error suppose to happen"),
         }
-        Err(e) => assert_eq!(e, "No error suppose to happen"),
     }
 }

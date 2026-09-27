@@ -16,31 +16,40 @@ pub struct UploadRes {
     success: bool,
     message: String,
 }
-pub async fn call_upload(url: &str, req: UploadReq) -> AttachmentStatus {
-    let res = reqwest::Client::new().post(url).json(&req).send().await;
+pub struct Uploader {
+    pub client: ureq::Agent,
+}
 
-    match res {
-        Ok(value) => {
-            let data: Result<UploadRes, reqwest::Error> = value.json().await;
-            match data {
+impl Uploader {
+    pub fn new() -> Self {
+        Self {
+            client: ureq::Agent::new_with_defaults(),
+        }
+    }
+    pub fn call_upload(&self, url: &str, req: UploadReq) -> AttachmentStatus {
+        let res = self.client.post(url).send_json(&req);
+
+        match res {
+            Ok(response) => match response.into_body().read_json::<UploadRes>() {
                 Ok(r) => {
                     if r.message == "Empty attachment" || r.message == "Ignoring small attachments"
                     {
-                        return AttachmentStatus::SkippedTooSmall;
+                        AttachmentStatus::SkippedTooSmall
                     } else if r.success {
-                        return AttachmentStatus::Uploaded;
+                        AttachmentStatus::Uploaded
+                    } else {
+                        AttachmentStatus::FailedRetryable
                     }
-                    return AttachmentStatus::FailedRetryable;
                 }
                 Err(e) => {
-                    eprintln!("deserilazation failed : {e}");
-                    return AttachmentStatus::FailedRetryable;
+                    eprintln!("deserialization failed: {e}");
+                    AttachmentStatus::FailedRetryable
                 }
+            },
+            Err(e) => {
+                eprintln!("call to uploader failed: {e}");
+                AttachmentStatus::FailedRetryable
             }
         }
-        Err(e) => {
-            eprintln!("call to uploader failed {e}");
-            return AttachmentStatus::FailedRetryable;
-        }
-    };
+    }
 }
